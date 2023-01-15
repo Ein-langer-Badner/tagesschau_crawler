@@ -24,6 +24,7 @@ def tages_leser():
     head_list = []
     short_list = []
     link_list = []
+    replace_lex = {"sportschau.de": "", "wdr.de": "", "wdr": ""}
 
     for var1 in range(len(saved_site.select(".columns .teaser__shorttext"))):
         top_list.append(saved_site.select(".columns .teaser__topline")[var1].text.strip())
@@ -33,8 +34,8 @@ def tages_leser():
 
     # Anpassung der Daten beginnt hier
     for var1 in range(len(short_list)):
-        if "sportschau.de" in short_list[var1]:
-            short_list[var1] = short_list[var1].replace("sportschau.de", "").strip()
+        for key, value in replace_lex.items():
+            short_list[var1] = short_list[var1].replace(key, value).strip()
 
     short_list.pop(top_list.index("ARD-Programm"))
     head_list.pop(top_list.index("ARD-Programm"))
