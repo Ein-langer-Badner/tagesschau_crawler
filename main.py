@@ -24,7 +24,7 @@ def tages_leser():
     head_list = []
     short_list = []
     link_list = []
-    replace_lex = {"sportschau.de": "", "wdr.de": "", "wdr": ""}
+    replace_lex = {"sportschau.de": "", "wdr.de": "", "wdr": "", "sr.de": ""}
 
     for var1 in range(len(saved_site.select(".columns .teaser__shorttext"))):
         top_list.append(saved_site.select(".columns .teaser__topline")[var1].text.strip())
@@ -55,7 +55,7 @@ def tages_leser():
     for var1 in range(len(head_list)):
         title = head_list[var1].strip()
         topline = top_list[var1].strip()
-        kurzfassung = short_list[var1].strip()
+        kurzfassung = short_list[var1].strip().split(". ")
         link = link_list[var1].strip()
         ausgabe = TagesSchauArtikel(topline, title, kurzfassung, link)
         return_list.append(ausgabe)
@@ -68,8 +68,12 @@ def csv_schreiber_tagesschau(nachrichten_eingabe):
         for var1 in range(len(nachrichten_eingabe)):
             newswriter.writerow([nachrichten_eingabe[var1].schlagzeile])
             newswriter.writerow([nachrichten_eingabe[var1].topline])
-            newswriter.writerow([nachrichten_eingabe[var1].kurzfassung])
+
+            for line in nachrichten_eingabe[var1].kurzfassung:
+                newswriter.writerow([line])
+
             newswriter.writerow([nachrichten_eingabe[var1].link])
+            newswriter.writerow([])
             newswriter.writerow([])
 
 
