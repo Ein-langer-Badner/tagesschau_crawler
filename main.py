@@ -13,8 +13,8 @@ class TagesSchauArtikel:
         self.link = link
 
 
-def tages_leser():
-    url = "https://www.tagesschau.de/"
+def tages_leser(rubrik_url):
+    url = rubrik_url
     sleep(1)
     return_list = []
     site = req.get(url)
@@ -24,7 +24,12 @@ def tages_leser():
     head_list = []
     short_list = []
     link_list = []
-    replace_lex = {"sportschau.de": "", "wdr.de": "", "wdr": "", "sr.de": ""}
+    replace_lex = {
+        "mehr": "", "sportschau.de": "", "wdr.de": "", "wdr": "",
+        "sr.de": "", "audio": "", "ndr": "", "ardthek.de": "",
+        "europamagazin": "", "rbb": "", "swr": "", "thek": "",
+        "mdr": "", "hr": "", "br": "" , "sportschau": ""
+    }
 
     for var1 in range(len(saved_site.select(".columns .teaser__shorttext"))):
         top_list.append(saved_site.select(".columns .teaser__topline")[var1].text.strip())
@@ -37,19 +42,25 @@ def tages_leser():
         for key, value in replace_lex.items():
             short_list[var1] = short_list[var1].replace(key, value).strip()
 
-    short_list.pop(top_list.index("ARD-Programm"))
-    head_list.pop(top_list.index("ARD-Programm"))
-    link_list.pop(top_list.index("ARD-Programm"))
-    top_list.pop(top_list.index("ARD-Programm"))
+    if "ARD-Programm" in top_list:
+        short_list.pop(top_list.index("ARD-Programm"))
+        head_list.pop(top_list.index("ARD-Programm"))
+        link_list.pop(top_list.index("ARD-Programm"))
+        top_list.pop(top_list.index("ARD-Programm"))
 
-    top_list.pop(head_list.index("tagesthemen"))
-    short_list.pop()
-    link_list.pop(head_list.index("tagesthemen"))
-    head_list.pop(head_list.index("tagesthemen"))
+    if "tagesthemen" in head_list:
+        top_list.pop(head_list.index("tagesthemen"))
+        short_list.pop()
+        link_list.pop(head_list.index("tagesthemen"))
+        head_list.pop(head_list.index("tagesthemen"))
 
-    new_link = urljoin(url, link_list[len(link_list) - 1])
     link_list.pop()
-    link_list.append(new_link)
+    link_list.pop()
+    new_link1 = urljoin(url, link_list[len(link_list) - 2])
+    link_list.append(new_link1)
+
+    new_link2 = urljoin(url, link_list[len(link_list) - 1])
+    link_list.append(new_link2)
     # Anpassung der Daten endet hier
 
     for var1 in range(len(head_list)):
@@ -59,6 +70,17 @@ def tages_leser():
         link = link_list[var1].strip()
         ausgabe = TagesSchauArtikel(topline, title, kurzfassung, link)
         return_list.append(ausgabe)
+    return return_list
+
+
+def rubriken_leser():
+    # rubriken = ("/", "/inland/", "/ausland/", "/wirtschaft/", "/wissen/", "/faktenfinder/", "/investigativ/")
+    rubriken = ("/")
+    return_list = []
+    url = "https://www.tagesschau.de"
+    for rubrik in rubriken:
+        rubrik_url = urljoin(url, rubrik)
+        return_list += tages_leser(rubrik_url)
     return return_list
 
 
@@ -78,7 +100,7 @@ def csv_schreiber_tagesschau(nachrichten_eingabe):
 
 
 def main():
-    nachrichten = tages_leser()
+    nachrichten = rubriken_leser()
     csv_schreiber_tagesschau(nachrichten)
 
 
